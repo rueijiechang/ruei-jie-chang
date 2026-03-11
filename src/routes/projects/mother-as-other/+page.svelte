@@ -1,13 +1,13 @@
 <script lang="ts">
   import { reveal } from '$lib/actions/reveal.js';
 
-  // ── Essay metadata — edit to update header info ──
+  // ── Essay metadata 
   const paper = {
     title:  'mOther as the Other:',
     subtitle: 'Language, Alienation, and the Impossibility of the Mother Tongue',
     field:  'Comparative Literature / Critical Theory',
     year:   '2024',
-    status: 'Essay',
+    status: '',
   };
 </script>
 
