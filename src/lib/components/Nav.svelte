@@ -80,6 +80,7 @@
     color: var(--text-secondary);
     transition: color var(--duration-fast) ease;
     position: relative;
+    white-space: nowrap; 
   }
 
   .nav__link::after {
@@ -102,4 +103,11 @@
   .nav__link.active::after {
     width: 100%;
   }
+
+/* Responsive */
+  @media (max-width: 640px) {
+  .nav__logo-text { font-size: 0.7rem; letter-spacing: 0.04em; } /* ← shrink logo */
+  .nav__links { gap: 0.75rem; }                                   /* ← tighter gap */
+  .nav__link { font-size: 0.65rem; letter-spacing: 0.04em; }     /* ← shrink links */
+}
 </style>

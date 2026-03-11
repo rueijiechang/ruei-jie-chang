@@ -643,10 +643,30 @@
 
 @media (max-width: 640px) {
   .hero { padding-top: 2rem; }
-  .hero__bottom { grid-template-columns: 1fr; gap: 1.5rem; }
-  .hero__tagline-vert { writing-mode: horizontal-tb; transform: none; }
+
+  /* poem block left aligned on mobile */
+  .time-block {
+    max-width: 100%;
+    align-items: flex-start;
+    text-align: left;
+  }
+  .time-block__attr {
+    white-space: normal;
+  }
+
+  .hero__bottom {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .hero__tagline-vert {
+    writing-mode: horizontal-tb;
+    transform: none;
+  }
+
   .projects-grid { grid-template-columns: 1fr; }
   .hero__cta { flex-direction: column; }
+  .section__header { padding: 0 0.25rem; }
+  .section { padding: var(--space-md) var(--space-sm); }
 }
-
 </style>

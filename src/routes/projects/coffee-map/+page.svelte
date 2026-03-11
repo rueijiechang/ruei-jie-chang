@@ -547,10 +547,11 @@
   }
 
   /* Responsive */
-  @media (max-width: 640px) {
-  .map-row { grid-template-columns: 1fr; }
-  .sidebar { max-height: 40vh; }
-  #map { height: 60vh; }
+@media (max-width: 640px) {
+  .page { height: auto; overflow: auto; }
+  .map-row { grid-template-columns: 1fr; display: flex; flex-direction: column; }
+  .sidebar { max-height: none; order: 1; }
+  #map { height: 50vh; order: 2; }    
   .controls { gap: 0.5rem; }
   .legend { display: none; }
 }
