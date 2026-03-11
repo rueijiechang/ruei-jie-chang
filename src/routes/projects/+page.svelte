@@ -42,6 +42,15 @@
   status: 'Unpublished',
   featured: true,
 },
+{
+  slug: 'mother-as-other',
+  title: 'mOther as the Other: Language, Alienation, and the Impossibility of the Mother Tongue',
+  year: '2024',
+  tags: ['Research', 'Writing', 'Language'],
+  desc: 'A theoretical memoir examining the mother tongue through Lacanian psychoanalysis, tracing the linguistic histories of Canetti, Lahiri, and my own experience as a Taiwanese speaker.',
+  status: 'Essay',
+  featured: true,
+},
 
   ];
 

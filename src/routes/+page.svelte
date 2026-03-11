@@ -37,7 +37,7 @@
       year: '2024',
       tags: ['Research', 'Writing', 'AI'],
       desc: 'What does it mean that generative AI consistently imagines itself as a feminized humanoid robot? A critical examination of visual repetition, historical imaginary, and political foreclosure in AI-generated images.',
-      status: 'Unpublished',
+      status: '',
     },
     {
       slug: 'material-configurations',
@@ -46,8 +46,17 @@
       year: '2024',
       tags: ['Research', 'Writing', 'Data', 'AI'],
       desc: "A new materialist account of how AI-generated text emerges — examining GPT-2's tokenization, embeddings, and attention mechanisms to argue that meaning in AI text is not absent but differently configured.",
-      status: 'Unpublished',
+      status: '',
     },
+    {
+  slug: 'mother-as-other',
+  image: '/images/photography/54.jpg',
+  title: 'mOther as the Other: Language, Alienation, and the Impossibility of the Mother Tongue',
+  year: '2024',
+  tags: ['Research', 'Writing', 'Language'],
+  desc: 'A theoretical memoir examining the mother tongue through Lacanian psychoanalysis, tracing the linguistic histories of Canetti, Lahiri, and my own experience as a Taiwanese speaker.',
+  status: "",
+},
   ];
 
   // ─────────────────────────────────────────────
@@ -337,7 +346,9 @@
             {#each p.tags as tag}
               <span class="tag">{tag}</span>
             {/each}
-            <span class="tag tag--status">{p.status}</span>
+            {#if p.status}
+              <span class="tag tag--status">{p.status}</span>
+            {/if}
           </div>
           <h2 class="heading-sm project-card__title">{p.title}</h2>
           <p class="project-card__desc">{p.desc}</p>
