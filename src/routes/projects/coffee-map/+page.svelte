@@ -460,7 +460,7 @@ async function geocodeCoffees() {
   }
 
   /* ── Sidebar ── */
-  .aside, .sidebar {
+ .sidebar {
     border-right: 1px solid var(--border);
     background: var(--bg);
     padding: 2rem 1.5rem; /* ── sidebar inner padding ── */

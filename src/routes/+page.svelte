@@ -1,6 +1,8 @@
-<script>
+<script lang="ts">
+  // ── lang="ts" added — enables TypeScript in this file ──
   import { onMount } from 'svelte';
   import { reveal } from '$lib/actions/reveal.js';
+  import type { Poem, FeaturedProject, FragmentPart } from '$lib/types';
 
   // ─────────────────────────────────────────────
   // HERO CONTENT — edit these strings to update copy
@@ -11,8 +13,9 @@
 
   // ─────────────────────────────────────────────
   // FEATURED PROJECTS
+  // ── FeaturedProject type ensures every card has the right shape ──
   // ─────────────────────────────────────────────
-  const featured = [
+  const featured: FeaturedProject[] = [
     {
       slug: 'photography',
       image: '/images/photography/84.jpg',
@@ -52,13 +55,13 @@
   // ─────────────────────────────────────────────
   // HOUR → WORD MAP
   // ─────────────────────────────────────────────
-  const hourWords = [
+  const hourWords: string[] = [
     'midnight','one','two','three','four','five','six','seven',
     'eight','nine','ten','eleven','noon','one','two','three',
     'four','five','six','seven','eight','nine','ten','eleven',
   ];
 
-  const minuteWords = [
+  const minuteWords: string[] = [
     'zero','one','two','three','four','five','six','seven','eight','nine',
     'ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen',
     'seventeen','eighteen','nineteen','twenty','twenty-one','twenty-two',
@@ -71,32 +74,32 @@
     'fifty-four','fifty-five','fifty-six','fifty-seven','fifty-eight','fifty-nine',
   ];
 
-  const fallbackWords = ['hour', 'clock', 'time'];
+  const fallbackWords: string[] = ['hour', 'clock', 'time'];
 
   // ─────────────────────────────────────────────
-  // STATE
+  // STATE — typed so TypeScript knows what each variable holds
   // ─────────────────────────────────────────────
-  let fragment     = '';
-  let poemTitle    = '';
-  let poemAuthor   = '';
-  let searchedWord = '';
-  let loading      = true;
-  let noResult     = false;
-  let drawing      = false;
-  let poemPool     = [];
-  let displayed    = '';
-  let typing       = false;
-  let typewriterTimer;
+  let fragment:        string  = '';
+  let poemTitle:       string  = '';
+  let poemAuthor:      string  = '';
+  let searchedWord:    string  = '';
+  let loading:         boolean = true;
+  let noResult:        boolean = false;
+  let drawing:         boolean = false;
+  let poemPool:        Poem[]  = []; // ← typed as array of Poem
+  let displayed:       string  = '';
+  let typing:          boolean = false;
+  let typewriterTimer: ReturnType<typeof setInterval>; // ← typed timer
 
   // ─────────────────────────────────────────────
   // TIME HELPERS
   // ─────────────────────────────────────────────
-  function getNow() {
+  function getNow(): { hour: number; minute: number } {
     const d = new Date();
     return { hour: d.getHours(), minute: d.getMinutes() };
   }
 
-  function buildTimeLabel(hour, minute) {
+  function buildTimeLabel(hour: number, minute: number): string {
     const h = hourWords[hour];
     if (h === 'midnight' && minute === 0) return 'it is midnight';
     if (h === 'noon'     && minute === 0) return 'it is noon';
@@ -109,7 +112,7 @@
   // TYPEWRITER
   // ── speed: change the ms value below ──
   // ─────────────────────────────────────────────
-  function typewrite(text) {
+  function typewrite(text: string): void {
     clearInterval(typewriterTimer);
     displayed = '';
     typing    = true;
@@ -125,16 +128,16 @@
   }
 
   // ─────────────────────────────────────────────
-  // POETRY FETCH
+  // POETRY FETCH — fetches from poetrydb.org API
   // ─────────────────────────────────────────────
-  async function queryPoetryDB(word) {
+  async function queryPoetryDB(word: string): Promise<Poem[] | null> {
     const res  = await fetch(`https://poetrydb.org/lines/${encodeURIComponent(word)}`);
     const data = await res.json();
     if (!Array.isArray(data) || data.length === 0) return null;
-    return data;
+    return data as Poem[];
   }
 
-  function extractFragment(lines, word) {
+  function extractFragment(lines: string[], word: string): string {
     const idx = lines.findIndex(
       l => l.toLowerCase().includes(word.toLowerCase()) && l.trim().length > 3
     );
@@ -151,7 +154,7 @@
     return matched;
   }
 
-  function drawFromPool(word) {
+  function drawFromPool(word: string): void {
     const poem   = poemPool[Math.floor(Math.random() * poemPool.length)];
     poemTitle    = poem.title;
     poemAuthor   = poem.author;
@@ -160,7 +163,7 @@
     typewrite(`"${text}"`);
   }
 
-  async function fetchPoems() {
+  async function fetchPoems(): Promise<void> {
     loading  = true;
     noResult = false;
     poemPool = [];
@@ -184,7 +187,7 @@
     loading = false;
   }
 
-  function drawAnother() {
+  function drawAnother(): void {
     if (drawing || poemPool.length === 0) return;
     drawing = true;
     drawFromPool(searchedWord);
@@ -192,7 +195,7 @@
   }
 
   // Headline word animation
-  let words = [];
+  let words: HTMLElement[] = []; // ← typed as array of HTML elements
   onMount(() => {
     words.forEach((el, i) => {
       setTimeout(() => el.classList.add('visible'), 120 * i + 200);
@@ -205,7 +208,7 @@
   $: timeLabel = buildTimeLabel(now.hour, now.minute);
 
   // Split displayed string for word highlighting
-  $: fragmentParts = (() => {
+  $: fragmentParts = ((): FragmentPart[] => {
     if (!searchedWord || !displayed) return [{ text: displayed, highlight: false }];
     const lower = displayed.toLowerCase();
     const idx   = lower.indexOf(searchedWord.toLowerCase());
@@ -370,11 +373,6 @@
     margin-bottom: 3.5rem;    /* ── space between top row and headline ── */
   }
 
-  .hero__name {
-    /* inherits .label styles — uppercase, small, muted */
-    color: var(--text-primary);
-    font-weight: 600;
-  }
 
   /* ════════════════════════════════════
      TIME BLOCK — top right of hero
@@ -594,14 +592,13 @@
   .project-card {
     display: flex;
     flex-direction: column;
-    background: #9cc7e3;
+    background: #9cc7e3;         /* ── card background color ── */
     transition: background var(--duration-fast) ease;
     /* border: 1px solid var(--border); */
     margin: -1px;
     border:none;
-  
-
   }
+
   .project-card:hover { background: var(--surface-hover); }
 
   .project-card__thumb {
@@ -644,7 +641,7 @@
   }
 
   .tag--status {
-    border-color: var(--accent-light);
+    border-color: var(--accent-light);  /* ── status tag border color ── */
     color: var(--accent);
   }
 
@@ -661,7 +658,7 @@
     inset: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: cover;       /* ── change to 'contain' to avoid cropping ── */
     object-position: center;
   }
 </style>
