@@ -2,7 +2,9 @@
   import '../app.css';
   import Nav from '$lib/components/Nav.svelte';
   import Footer from '$lib/components/Footer.svelte';
-  import { injectAnalytics } from '@vercel/analytics/sveltekit'
+  import { dev } from '$app/environment';
+  import { injectAnalytics } from '@vercel/analytics/sveltekit';
+  injectAnalytics({ mode: dev ? 'development' : 'production' });
 </script>
 
 <Nav />
