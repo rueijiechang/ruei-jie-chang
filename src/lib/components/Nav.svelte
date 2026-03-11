@@ -1,7 +1,7 @@
-<script>
-  import { page } from '$app/stores';
+<script lang="ts">
+  import { page } from '$app/state';
 
-  // ── Customize nav links here ──
+// Links to pages to display in the nav
   const links = [
     { href: '/',         label: 'Home' },
     { href: '/about',    label: 'About' },
@@ -9,12 +9,11 @@
   ];
 </script>
 
-<nav class="nav">
+<nav class="nav" aria-label="Main navigation">
   <div class="container nav__inner">
-
-    <!-- ── Logo / name — change text here ── -->
+  <!-- logo back to home  -->
     <a href="/" class="nav__logo">
-      <span class="nav__logo-text">RUEI-JIE (RACHEL) CHANG</span> <!-- initials or short name -->
+      <span class="nav__logo-text">RUEI-JIE (RACHEL) CHANG</span>
     </a>
 
     <ul class="nav__links">
@@ -23,7 +22,7 @@
           <a
             href={link.href}
             class="nav__link"
-            class:active={$page.url.pathname === link.href}
+            class:active={page.url.pathname === link.href}
           >
             {link.label}
           </a>
@@ -43,7 +42,6 @@
     z-index: 100;
     padding: 1.25rem 0;
     background: color-mix(in oklch, var(--bg) 85%, transparent);
-
     backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
   }
@@ -66,13 +64,13 @@
     font-weight: 600;
     letter-spacing: 0.08em;
     color: var(--text-primary);
-    /* ── change color of logo initials here ── */
   }
 
   .nav__links {
     display: flex;
     list-style: none;
-    gap: 2rem; /* ── spacing between nav items ── */
+    /* ── spacing between nav items ── */
+    gap: 2rem;
   }
 
   .nav__link {
@@ -91,7 +89,7 @@
     left: 0;
     width: 0;
     height: 1px;
-    background: var(--accent); /* ── underline accent color ── */
+    background: var(--accent);
     transition: width var(--duration-mid) var(--ease-out);
   }
 

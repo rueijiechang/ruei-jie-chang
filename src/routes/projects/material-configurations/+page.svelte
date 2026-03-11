@@ -1,11 +1,11 @@
-<script>
+<script lang="ts">
   import { reveal } from '$lib/actions/reveal.js';
 
   const paper = {
     title: 'Material, ĠConfig, urations, Ġof, ĠAI, -, Gener, ated, ĠText, s',
     field: 'Critical AI Studies / Digital Humanities',
     year: '2024',
-    pdf: '/papers/material-configurations.pdf', // ← place PDF in /static/papers/
+    pdf: '/papers/material-configurations.pdf',
     status: 'Unpublished manuscript',
   };
 </script>
@@ -110,7 +110,7 @@
 
     <hr class="divider" />
 
-    <!-- ── Pull quote ── -->
+    <!-- ── Quote ── -->
     <section class="section section--quote fade-up" use:reveal>
       <blockquote class="pullquote">
         The challenge is not to reject or uncritically embrace these technologies,
@@ -164,7 +164,6 @@
     gap: var(--space-md);
   }
 
-  /* ── Companion note ── */
   .companion {
     font-style: italic;
   }
@@ -235,4 +234,12 @@
     color: var(--bg);
     border-color: var(--text-primary);
   }
+
+  @media (max-width: 640px) {
+  .paper-title { font-size: 1.6rem; }
+  .section__body { font-size: 0.95rem; }
+  .pullquote { font-size: 1.1rem; }
+  .paper-page { padding-top: var(--space-md); }
+}
+
 </style>

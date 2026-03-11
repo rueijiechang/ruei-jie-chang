@@ -1,16 +1,18 @@
-<script>
+<script lang="ts">
   import { onMount } from 'svelte';
+  import type { Coffee, GeoResult, CurrentWeather } from '$lib/types';
 
-  // ── WEATHER CODE LOOKUP — add more codes if needed ──
-  const weatherDescriptions = {
+  //  WEATHER CODE LOOKUP
+  const weatherDescriptions: Record<number, string> = {
     0: 'Clear sky', 1: 'Mostly clear',
     2: 'Partly cloudy', 3: 'Overcast',
     45: 'Foggy', 51: 'Drizzle', 61: 'Rain',
     71: 'Snow', 80: 'Showers', 95: 'Thunderstorm',
   };
 
-  // ── YOUR TASTED COFFEES — add new rows here as you taste more ──
-  const tastedCoffees = [
+  // MY TASTED COFFEES
+  // Coffee[] type ensures every entry has the right fields
+  const tastedCoffees: Coffee[] = [
     { roaster: '19', country: 'Panama', region: 'Lino', farm: 'Hacienda La Esmeralda', producer: null, variety: 'Gesha', process: 'Washed', rating: 9 },
     { roaster: '19', country: 'Panama', region: 'Cabana Abajo', farm: 'Hacienda La Esmeralda', producer: null, variety: 'Gesha', process: 'Natural', rating: 8 },
     { roaster: 'Aviary', country: 'Rwanda', region: 'Gakenke', farm: null, producer: 'Emmanuel Rusatira', variety: 'Red Bourbon', process: 'Honey + Washed', rating: 9 },
@@ -100,38 +102,45 @@
     { roaster: 'Metric', country: 'Honduras', region: 'Santa Bárbara', farm: 'La Sierra', producer: 'Alma Pineda', variety: 'Parainema', process: 'Washed', rating: 3 },
   ];
 
-  // ── SIDEBAR COPY — edit all text here ──
+  // SIDEBAR
   const sidebarTitle = 'Coffee Tasting Map';
-  const sidebarDesc = "An interactive, geocoded archive of my single-origin coffee tastings, linking sensory notes to origin regions and real-time weather data to present the relationship between location, terrrain, climate, and flavor. Each pin represents a coffee I've tasted, colored by rating and linked to detailed documentation of its origin, processing method, and roaster.";  
+  const sidebarDesc  = "An interactive, geocoded archive of my single-origin coffee tastings, linking sensory notes to origin regions and real-time weather data to present the relationship between location, terrrain, climate, and flavor. Each pin represents a coffee I've tasted, colored by rating and linked to detailed documentation of its origin, processing method, and roaster.";
   const sidebarNote  = 'Pins are geocoded on load via the Open Meteo API. It may take a few seconds for all pins to appear.';
 
-  // ── STATS — computed automatically from tastedCoffees, no edits needed ──
+  // STATS computed automatically from tastedCoffees
   $: totalCoffees   = tastedCoffees.length;
   $: totalCountries = [...new Set(tastedCoffees.map(c => c.country))].length;
   $: topRated       = tastedCoffees.filter(c => c.rating != null && c.rating >= 9).length;
 
-  // ── MAP STATE ──
-  let map;
-  let L;
-  let searchQuery    = '';
-  let searchMarker   = null;
-  let coffeeMarkers  = [];
-  let isSearching    = false;
-  let searchError    = '';
+  // MAP STATE
+  // Typed so TypeScript knows what each variable holds 
+  let map: any;
+  // Leaflet library (dynamically imported)
+  let L: any; 
+  let searchQuery:   string  = '';
+  let searchMarker:  any     = null;
+  let coffeeMarkers: any[]   = [];
+  let isSearching:   boolean = false;
+  let searchError:   string  = '';
 
-  // ── GEOCODING ──
-  async function geocodeQuery(query) {
+  // GEOCODING calls Open-Meteo geocoding API 
+  async function geocodeQuery(query: string): Promise<GeoResult | null> {
     const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=1&language=en&format=json`;
     const res  = await fetch(url);
     const data = await res.json();
     if (data.results && data.results.length > 0) {
-      return { lat: data.results[0].latitude, lng: data.results[0].longitude, name: data.results[0].name, country: data.results[0].country };
+      return {
+        lat:     data.results[0].latitude,
+        lng:     data.results[0].longitude,
+        name:    data.results[0].name,
+        country: data.results[0].country,
+      };
     }
     return null;
   }
 
-  // ── RATING → COLOR — adjust thresholds here ──
-  function ratingColor(rating) {
+  // RATING to COLOR 
+  function ratingColor(rating: number): string {
     if (rating === null || rating === undefined) return '#94a3b8';
     if (rating >= 9) return '#22c55e';
     if (rating >= 7) return '#f59e0b';
@@ -139,97 +148,96 @@
     return '#ef4444';
   }
 
-  // ── GEOCODE ALL COFFEES ON LOAD ──
-async function geocodeCoffees() {
-  const seen = {};
-  for (const coffee of tastedCoffees) {
-    const regionKey  = coffee.region ? `${coffee.region}, ${coffee.country}` : null;
-    const countryKey = coffee.country;
+  // GEOCODE ALL COFFEES ON LOAD 
+  async function geocodeCoffees(): Promise<void> {
+    const seen: Record<string, GeoResult | null> = {}; 
+    for (const coffee of tastedCoffees) {
+      const regionKey  = coffee.region ? `${coffee.region}, ${coffee.country}` : null;
+      const countryKey = coffee.country;
 
-    if (regionKey) {
-      if (!seen[regionKey]) {
-        seen[regionKey] = await geocodeQuery(regionKey);
-        await new Promise(r => setTimeout(r, 80));
+      if (regionKey) {
+        if (!seen[regionKey]) {
+          seen[regionKey] = await geocodeQuery(regionKey);
+          await new Promise(r => setTimeout(r, 80));
+        }
+        coffee._geo = seen[regionKey];
       }
-      coffee._geo = seen[regionKey];
-    }
 
-    if (!coffee._geo) {
-      if (!seen[countryKey]) {
-        seen[countryKey] = await geocodeQuery(countryKey);
-        await new Promise(r => setTimeout(r, 80));
+      if (!coffee._geo) {
+        if (!seen[countryKey]) {
+          seen[countryKey] = await geocodeQuery(countryKey);
+          await new Promise(r => setTimeout(r, 80));
+        }
+        coffee._geo = seen[countryKey];
       }
-      coffee._geo = seen[countryKey];
-    }
 
-    // ── Render this pin immediately as soon as its coords are ready ──
-    if (coffee._geo) renderPin(coffee);
+      // Render this pin immediately as soon as it is ready ──
+      if (coffee._geo) renderPin(coffee);
+    }
   }
-}
 
-  // ── RENDER COFFEE PINS, APPEAR ONE BY ONE ──
+  // RENDER COFFEE PINS appear one by one ──
+  function renderPin(coffee: Coffee): void {
+    const color = ratingColor(coffee.rating);
 
-  function renderPin(coffee) {
-  const color = ratingColor(coffee.rating);
-
-  // ── Pin size — adjust width/height/iconSize/iconAnchor together ──
-  const icon = L.divIcon({
-    html: `<div style="
-      width: 14px; height: 14px;
-      background: ${color};
-      border: 2px solid white;
-      border-radius: 50%;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.4);
-      cursor: pointer;
-    "></div>`,
-    className: '',
-    iconSize: [14, 14],
-    iconAnchor: [7, 7],
-  });
-
-  // const marker = L.marker([coffee._geo.lat, coffee._geo.lng], { icon })
-  const jitter = () => (Math.random() - 0.5) * 0.8; /* ── adjust 0.8 to spread more/less ── */
-  const marker = L.marker([coffee._geo.lat + jitter(), coffee._geo.lng + jitter()], { icon })
-    .addTo(map)
-    .on('click', async function () {
-      let w = null;
-      try {
-        const url =
-          `https://api.open-meteo.com/v1/forecast` +
-          `?latitude=${coffee._geo.lat}&longitude=${coffee._geo.lng}` +
-          `&current=temperature_2m,weathercode,windspeed_10m,relative_humidity_2m` +
-          `&temperature_unit=celsius&timezone=auto`;
-        const res  = await fetch(url);
-        const data = await res.json();
-        w = data.current;
-      } catch (e) { w = null; }
-
-      this.bindPopup(`
-        <div style="min-width:180px; font-family: inherit;">
-          <div style="font-weight:600; font-size:0.95rem;">${coffee.country}</div>
-          ${coffee.region   ? `<div style="font-size:0.78rem;color:#555;margin-bottom:6px;">${coffee.region}</div>` : ''}
-          ${coffee.producer ? `<div style="font-size:0.8rem;"><span style="color:#555;font-size:0.72rem;text-transform:uppercase;">Producer</span> ${coffee.producer}</div>` : ''}
-          ${coffee.farm     ? `<div style="font-size:0.8rem;"><span style="color:#555;font-size:0.72rem;text-transform:uppercase;">Farm</span> ${coffee.farm}</div>` : ''}
-          ${coffee.variety  ? `<div style="font-size:0.8rem;"><span style="color:#555;font-size:0.72rem;text-transform:uppercase;">Variety</span> ${coffee.variety}</div>` : ''}
-          ${coffee.process  ? `<div style="font-size:0.8rem;"><span style="color:#555;font-size:0.72rem;text-transform:uppercase;">Process</span> ${coffee.process}</div>` : ''}
-          <div style="font-size:0.8rem;"><span style="color:#555;font-size:0.72rem;text-transform:uppercase;">Roaster</span> ${coffee.roaster}</div>
-          ${coffee.rating != null ? `<div style="font-size:1.2rem;font-weight:700;color:${ratingColor(coffee.rating)};margin-top:6px;">${coffee.rating} / 10</div>` : ''}
-          ${w ? `
-            <div style="margin-top:8px;padding-top:8px;border-top:1px solid #e5e7eb;">
-              <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;color:#555;margin-bottom:4px;">Current Weather</div>
-              <span style="font-size:1.2rem;font-weight:700;">${w.temperature_2m}°C</span>
-              <span style="font-size:0.8rem;color:#555;margin-left:4px;">${weatherDescriptions[w.weathercode] ?? ''}</span>
-              <div style="font-size:0.8rem;color:#555;">${w.relative_humidity_2m}% humidity · ${w.windspeed_10m} km/h</div>
-            </div>` : ''}
-        </div>
-      `).openPopup();
+    // Pin size
+    const icon = L.divIcon({
+      html: `<div style="
+        width: 14px; height: 14px;
+        background: ${color};
+        border: 2px solid white;
+        border-radius: 50%;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+        cursor: pointer;
+      "></div>`,
+      className: '',
+      iconSize: [14, 14],
+      iconAnchor: [7, 7],
     });
+// jitter to prevent exact overlapping pins from same region
+    const jitter = () => (Math.random() - 0.5) * 0.8;
+    const marker = L.marker([coffee._geo!.lat + jitter(), coffee._geo!.lng + jitter()], { icon })
+      .addTo(map)
+      .on('click', async function (this:any) {
+        // Fetch live weather from Open-Meteo when pin is clicked 
+        let w: CurrentWeather | null = null;
+        try {
+          const url =
+            `https://api.open-meteo.com/v1/forecast` +
+            `?latitude=${coffee._geo!.lat}&longitude=${coffee._geo!.lng}` +
+            `&current=temperature_2m,weathercode,windspeed_10m,relative_humidity_2m` +
+            `&temperature_unit=celsius&timezone=auto`;
+          const res  = await fetch(url);
+          const data = await res.json();
+          w = data.current as CurrentWeather;
+        } catch (e) { w = null; }
 
-  coffeeMarkers.push(marker);
-}
+        this.bindPopup(`
+          <div style="min-width:180px; font-family: inherit;">
+            <div style="font-weight:600; font-size:0.95rem;">${coffee.country}</div>
+            ${coffee.region   ? `<div style="font-size:0.78rem;color:#555;margin-bottom:6px;">${coffee.region}</div>` : ''}
+            ${coffee.producer ? `<div style="font-size:0.8rem;"><span style="color:#555;font-size:0.72rem;text-transform:uppercase;">Producer</span> ${coffee.producer}</div>` : ''}
+            ${coffee.farm     ? `<div style="font-size:0.8rem;"><span style="color:#555;font-size:0.72rem;text-transform:uppercase;">Farm</span> ${coffee.farm}</div>` : ''}
+            ${coffee.variety  ? `<div style="font-size:0.8rem;"><span style="color:#555;font-size:0.72rem;text-transform:uppercase;">Variety</span> ${coffee.variety}</div>` : ''}
+            ${coffee.process  ? `<div style="font-size:0.8rem;"><span style="color:#555;font-size:0.72rem;text-transform:uppercase;">Process</span> ${coffee.process}</div>` : ''}
+            <div style="font-size:0.8rem;"><span style="color:#555;font-size:0.72rem;text-transform:uppercase;">Roaster</span> ${coffee.roaster}</div>
+            ${coffee.rating != null ? `<div style="font-size:1.2rem;font-weight:700;color:${ratingColor(coffee.rating)};margin-top:6px;">${coffee.rating} / 10</div>` : ''}
+            ${w ? `
+              <div style="margin-top:8px;padding-top:8px;border-top:1px solid #e5e7eb;">
+                <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;color:#555;margin-bottom:4px;">Current Weather</div>
+                <span style="font-size:1.2rem;font-weight:700;">${w.temperature_2m}°C</span>
+                <span style="font-size:0.8rem;color:#555;margin-left:4px;">${weatherDescriptions[w.weathercode] ?? ''}</span>
+                <div style="font-size:0.8rem;color:#555;">${w.relative_humidity_2m}% humidity · ${w.windspeed_10m} km/h</div>
+              </div>` : ''}
+          </div>
+        `).openPopup();
+      });
 
-  // ── LOCATION SEARCH ──
-  async function handleSearch() {
+    coffeeMarkers.push(marker);
+  }
+
+  //  LOCATION SEARCH
+  async function handleSearch(): Promise<void> {
     if (!searchQuery.trim()) return;
     isSearching = true;
     searchError = '';
@@ -256,11 +264,10 @@ async function geocodeCoffees() {
       .bindPopup(`<b>${result.name}</b><br>${result.country}`)
       .openPopup();
 
-    // ── Fly-to zoom level ──
     map.flyTo([result.lat, result.lng], 6, { duration: 1.2 });
   }
 
-  function handleKeydown(e) {
+  function handleKeydown(e: KeyboardEvent): void {
     if (e.key === 'Enter') handleSearch();
   }
 
@@ -271,42 +278,35 @@ async function geocodeCoffees() {
     // ── Initial map center [lat, lng] and zoom level ──
     map = L.map('map').setView([5, -20], 4);
 
-    // ── Swap tile URL here for a different map style ──
+    // ── Swap tile URL for different map styles ──
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
       attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
       subdomains: 'abcd',
       maxZoom: 19,
     }).addTo(map);
-// L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}{r}.png', {
-//   attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>',
-//   subdomains: 'abcd',
-//   maxZoom: 18,
-// }).addTo(map);
 
     await geocodeCoffees();
   });
 </script>
 
 <svelte:head>
-  <title>Coffee Map — RJC</title> <!-- ── Page title ── -->
+  <title>Coffee Map — RJC</title>
 </svelte:head>
 
 <div class="page">
 
-  <!-- ══════════════════════════════════
-       CONTROLS BAR — full width strip
-  ═══════════════════════════════════ -->
+  <!-- ────────────────────────────────────────────
+       CONTROLS BAR full width strip
+────────────────────────────────────────────═ -->
   <div class="controls">
     <div class="search-row">
-      <input
-        type="text"
-        bind:value={searchQuery}
+    <input type="text" bind:value={searchQuery} aria-label="Search for a place on the map"
         on:keydown={handleKeydown}
         placeholder="Search a place…"
         class="search-input"
         disabled={isSearching}
       />
-      <button on:click={handleSearch} class="search-btn" disabled={isSearching}>
+      <button on:click={handleSearch} class="search-btn" disabled={isSearching} aria-label="Search for a location">
         {isSearching ? '…' : 'Go'}
       </button>
     </div>
@@ -315,7 +315,6 @@ async function geocodeCoffees() {
       <p class="search-error">{searchError}</p>
     {/if}
 
-    <!-- ── Legend: keep colors in sync with ratingColor() above ── -->
     <div class="legend">
       <span class="legend-dot" style="background:#22c55e"></span><span>9–10</span>
       <span class="legend-dot" style="background:#f59e0b"></span><span>7–8</span>
@@ -326,28 +325,25 @@ async function geocodeCoffees() {
     </div>
   </div>
 
-  <!-- ══════════════════════════════════
+  <!-- ────────────────────────────────────────────
        MAP + SIDEBAR
-  ═══════════════════════════════════ -->
+  ──────────────────────────────────────────── -->
   <div class="map-row">
 
-
-    <!-- ══════════════════════════════════
-         SIDEBAR — edit copy at top of script
-    ═══════════════════════════════════ -->
+<!-- SIDEBAR -->
     <aside class="sidebar">
 
-      <p class="label sidebar__label">Project</p> <!-- ── small eyebrow label ── -->
+      <p class="label sidebar__label">Project</p>
       <h1 class="sidebar__title">{sidebarTitle}</h1>
       <p class="sidebar__desc">{sidebarDesc}</p>
 
-      <!-- ── Loading notice — edit sidebarNote in script to change text ── -->
+      <!--  Loading notice dot -->
       <div class="sidebar__notice">
         <span class="notice-dot"></span>
         {sidebarNote}
       </div>
 
-      <!-- ── Stats block — auto-calculated, sits at bottom ── -->
+      <!-- ── Stats block auto-calculated at bottom ── -->
       <div class="sidebar__stats">
         <div class="sidebar__stat">
           <span class="sidebar__stat-num">{totalCoffees}</span>
@@ -364,6 +360,7 @@ async function geocodeCoffees() {
       </div>
 
     </aside>
+
     <!-- MAP -->
     <div id="map"></div>
   </div>
@@ -375,7 +372,7 @@ async function geocodeCoffees() {
   .page {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 5rem); /* ── 5rem matches nav padding-top in layout ── */
+    height: calc(100vh - 5rem);
     overflow: hidden;
   }
 
@@ -410,7 +407,7 @@ async function geocodeCoffees() {
 
   .search-btn {
     padding: 0.35rem 0.9rem;
-    background: var(--text-primary); /* ── button bg color — try var(--accent) ── */
+    background: var(--text-primary); 
     color: var(--bg);
     border: none;
     border-radius: 2px;
@@ -433,7 +430,8 @@ async function geocodeCoffees() {
     font-size: 1rem;
     color: var(--text-secondary);
     flex-wrap: wrap;
-    margin-left: auto; /* ── pushes legend to the right of the bar ── */
+    /* ── pushes legend to the right of the bar ── */
+    margin-left: auto;
   }
   .legend-dot {
     display: inline-block;
@@ -447,7 +445,8 @@ async function geocodeCoffees() {
   /* ── Map + sidebar row ── */
   .map-row {
     display: grid;
-    grid-template-columns: 400px 1fr; /* ── sidebar width ── */
+    /* ── sidebar width ── */
+    grid-template-columns: 400px 1fr;
     flex: 1;
     overflow: hidden;
   }
@@ -460,24 +459,22 @@ async function geocodeCoffees() {
   }
 
   /* ── Sidebar ── */
- .sidebar {
+  .sidebar {
     border-right: 1px solid var(--border);
     background: var(--bg);
-    padding: 2rem 1.5rem; /* ── sidebar inner padding ── */
+    padding: 2rem 1.5rem;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 1.1rem;
   }
 
-  .sidebar__label {
-    margin-bottom: 0.1rem;
-  }
+  .sidebar__label { margin-bottom: 0.1rem; }
 
   .sidebar__title {
     margin-top: 1rem;
     font-family: var(--font-display);
-    font-size: 1.5rem; /* ── title size ── */
+    font-size: 1.5rem;
     font-weight: 500;
     color: var(--text-primary);
     line-height: 1.2;
@@ -485,12 +482,11 @@ async function geocodeCoffees() {
 
   .sidebar__desc {
     margin-top: 1rem;
-    font-size: 1.25rem; /* ── description size ── */
+    font-size: 1.25rem;
     color: var(--text-secondary);
     line-height: 1.25;
   }
 
-  /* ── Loading notice ── */
   .sidebar__notice {
     margin-top: 2.5rem;
     display: flex;
@@ -511,7 +507,7 @@ async function geocodeCoffees() {
     width: 9px; height: 9px;
     border-radius: 50%;
     background: var(--accent); /* ── dot color ── */
-    animation: pulse 2s ease-in-out infinite; /* ── remove line to stop pulsing ── */
+    animation: pulse 2s ease-in-out infinite; /* ── remove to stop pulsing ── */
   }
 
   @keyframes pulse {
@@ -519,7 +515,7 @@ async function geocodeCoffees() {
     50%       { opacity: 0.2; }
   }
 
-  /* ── Stats — pushed to bottom of sidebar ── */
+  /* ── Stats pushed to bottom of sidebar ── */
   .sidebar__stats {
     margin-top: auto;
     padding-top: 1.25rem;
@@ -537,7 +533,7 @@ async function geocodeCoffees() {
 
   .sidebar__stat-num {
     font-family: var(--font-display);
-    font-size: 1.8rem; /* ── stat number size ── */
+    font-size: 1.8rem;
     font-weight: 500;
     color: var(--text-primary);
     line-height: 1;
@@ -550,5 +546,12 @@ async function geocodeCoffees() {
     letter-spacing: 0.1em;
   }
 
-
+  /* Responsive */
+  @media (max-width: 640px) {
+  .map-row { grid-template-columns: 1fr; }
+  .sidebar { max-height: 40vh; }
+  #map { height: 60vh; }
+  .controls { gap: 0.5rem; }
+  .legend { display: none; }
+}
 </style>

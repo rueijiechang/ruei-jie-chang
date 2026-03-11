@@ -1,12 +1,13 @@
-<script>
+<script lang="ts">
   import { reveal } from '$lib/actions/reveal.js';
-const paper = {
-  title: 'An AI Image of the Imagined Image of AI',
-  course: 'Digital Visual Studies',
-  year: '2024',
-  pdf: '/papers/ai-imagined-image.pdf',
-  status: 'Unpublished manuscript', // ← add this
-};
+
+  const paper = {
+    title:  'An AI Image of the Imagined Image of AI',
+    course: 'Digital Visual Studies',
+    year:   '2024',
+    pdf:    '/papers/ai-imagined-image.pdf',
+    status: 'Unpublished manuscript',
+  };
 </script>
 
 <svelte:head>
@@ -34,11 +35,11 @@ const paper = {
 
     <hr class="divider" />
 
-    <!-- ── Image ── -->
+    <!-- ── Top ── -->
     <figure class="figure fade-up" use:reveal>
       <img
         src="/images/papers/ai-grid.jpg"
-        alt="Midjourney generated images using the prompt Artificial Intelligence"
+        alt="A grid of Midjourney outputs for the prompt Artificial Intelligence, showing repeated anthropomorphized feminized side-profile robot faces"
         class="figure__img"
       />
       <figcaption class="label figure__caption">
@@ -68,10 +69,9 @@ const paper = {
       generative models actively foreclosing political potential.
     </p>
 
-
     <hr class="divider" />
 
-    <!-- ── Argument ── -->
+    <!-- ── Section (Argument) ── -->
     <section class="section fade-up" use:reveal>
       <p class="label section__label">The Argument</p>
       <p class="section__body">
@@ -90,30 +90,27 @@ const paper = {
       </p>
     </section>
 
-    <!-- ── Robot figures ── -->
-    <figure class="figure figure--trio fade-up" use:reveal>
-      <div class="figure__trio-grid">
-        <div class="figure__trio-item">
-          <img src="/images/papers/ameca.jpg" alt="Ameca robot" class="figure__img" />
-          <figcaption class="label figure__caption">Ameca — Engineered Arts</figcaption>
-        </div>
-        <div class="figure__trio-item">
-          <img src="/images/papers/sophia.jpg" alt="Sophia robot" class="figure__img" />
-          <figcaption class="label figure__caption">Sophia — Hanson Robotics</figcaption>
-        </div>
-        <div class="figure__trio-item">
-          <img src="/images/papers/ava.jpg" alt="Ava from Ex Machina" class="figure__img" />
-          <figcaption class="label figure__caption">Ava — Ex Machina</figcaption>
-        </div>
-      </div>
-    </figure>
+    <!-- ── Images ── -->
+    <div class="figure__trio-grid fade-up" use:reveal>
+      <figure class="figure__trio-item">
+        <img src="/images/papers/ameca.jpg" alt="Ameca humanoid robot by Engineered Arts, with a grey face and expressive features" class="figure__img" />
+        <figcaption class="label figure__caption">Ameca — Engineered Arts</figcaption>
+      </figure>
+      <figure class="figure__trio-item">
+        <img src="/images/papers/sophia.jpg" alt="Sophia humanoid robot by Hanson Robotics, with a realistic female face" class="figure__img" />
+        <figcaption class="label figure__caption">Sophia — Hanson Robotics</figcaption>
+      </figure>
+      <figure class="figure__trio-item">
+        <img src="/images/papers/ava.jpg" alt="Ava, the fictional AI robot from the film Ex Machina, with a transparent mechanical body and human face" class="figure__img" />
+        <figcaption class="label figure__caption">Ava — Ex Machina</figcaption>
+      </figure>
+    </div>
 
     <hr class="divider" />
 
-    <!-- ── Benjamin & Aura ── -->
+    <!-- ── Section (Benjamin) ── -->
     <section class="section fade-up" use:reveal>
       <p class="label section__label">Aura, Reproducibility & the Paradigm Shift</p>
-      <!-- ── bridging sentence ── -->
       <p class="section__body">
         Beyond the sociopolitical critique, these images also demand a rethinking of what
         kind of art object they actually are.
@@ -134,11 +131,10 @@ const paper = {
       </p>
     </section>
 
-    <!-- ── DALL-E figure ── -->
     <figure class="figure figure--inline fade-up" use:reveal>
       <img
         src="/images/papers/dalle-foot.jpg"
-        alt="DALL-E generated image of a machine with just a foot"
+        alt="A DALL-E generated pic of a non-anthropomorphized machine wiht obe big foot"
         class="figure__img figure__img--contained"
       />
       <figcaption class="label figure__caption">
@@ -150,7 +146,7 @@ const paper = {
 
     <hr class="divider" />
 
-    <!-- ── Conclusion pull quote ── -->
+    <!-- ── Quote ── -->
     <section class="section section--quote fade-up" use:reveal>
       <blockquote class="pullquote">
         Just as we make AI human, we make it a woman.
@@ -162,11 +158,11 @@ const paper = {
     <!-- ── Download ── -->
     <section class="section section--download fade-up" use:reveal>
       <p class="label section__label">Full Paper</p>
-    <p class="section__body">
-  The complete paper includes extended analysis of the historical feminization of robots,
-  close readings of Benjamin and Offert, and a discussion of the political limits
-  of generative image models as art objects. {paper.status}.
-</p>
+      <p class="section__body">
+        The complete paper includes extended analysis of the historical feminization of robots,
+        close readings of Benjamin and Offert, and a discussion of the political limits
+        of generative image models as art objects. {paper.status}.
+      </p>
       <a href={paper.pdf} download class="download-btn label">
         ↓ Download PDF
       </a>
@@ -183,13 +179,8 @@ const paper = {
     max-width: 760px;
   }
 
-  .paper-header {
-    margin-bottom: var(--space-md);
-  }
-
-  .paper-header .label {
-    margin-bottom: 1rem;
-  }
+  .paper-header { margin-bottom: var(--space-md); }
+  .paper-header .label { margin-bottom: 1rem; }
 
   .paper-title {
     font-size: clamp(2rem, 5vw, 3.5rem);
@@ -208,9 +199,7 @@ const paper = {
     gap: 1rem;
   }
 
-  .section__label {
-    margin-bottom: 0.25rem;
-  }
+  .section__label { margin-bottom: 0.25rem; }
 
   .section__body {
     font-size: 1rem;
@@ -230,7 +219,6 @@ const paper = {
     gap: 0.75rem;
   }
 
-
   .figure__img {
     width: 100%;
     display: block;
@@ -246,6 +234,7 @@ const paper = {
     max-width: 580px;
   }
 
+  /* a div wrapper, each child is its own <figure> ── */
   .figure__trio-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -256,6 +245,7 @@ const paper = {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    margin: 0;
   }
 
   .figure__trio-item .figure__img {
@@ -264,9 +254,7 @@ const paper = {
     object-position: center top;
   }
 
-  .section--quote {
-    padding: var(--space-sm) 0;
-  }
+  .section--quote { padding: var(--space-sm) 0; }
 
   .pullquote {
     font-family: var(--font-display);
@@ -298,28 +286,19 @@ const paper = {
     border-color: var(--text-primary);
   }
 
-  .companion {
-  font-style: italic;
-}
+  .companion { font-style: italic; }
 
-.inline-link {
-  color: var(--accent);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  transition: color var(--duration-fast) ease;
-}
+  .inline-link {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color var(--duration-fast) ease;
+  }
 
-.inline-link:hover {
-  color: var(--accent-light);
-}
+  .inline-link:hover { color: var(--accent-light); }
 
   @media (max-width: 600px) {
-    .figure__trio-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .figure__img--contained {
-      max-width: 100%;
-    }
+    .figure__trio-grid { grid-template-columns: 1fr; }
+    .figure__img--contained { max-width: 100%; }
   }
 </style>

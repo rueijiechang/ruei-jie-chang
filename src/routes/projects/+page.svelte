@@ -1,15 +1,16 @@
-<script>
+<script lang="ts">
   import { reveal } from '$lib/actions/reveal.js';
 
-  // ── Add / remove projects here. slug must match folder in src/routes/projects/ ──
+  // ── List of projects ──
+  // tags shows up in filter
   const projects = [
 
     {
   slug: 'photography',
-  title: 'Textures of the World',
+  title: 'Textures',
   year: '2019–',
-  tags: ['Photography','Archive'],   // ← shows up in filter
-  desc: 'A minimalist B&W series documenting surface textures across six continents.',
+  tags: ['Photography','Archive'],   
+  desc: 'A personal black-and-white archive of surfaces gathered across geographies and time.',
   status: 'Ongoing',
   featured: true,
   },
@@ -41,11 +42,10 @@
   status: 'Unpublished',
   featured: true,
 },
-    // ── Add more project objects here ──
+
   ];
 
   // ── Filter state ──
-  import { writable } from 'svelte/store';
   let activeTag = 'All';
 
   // Collect unique tags
@@ -144,7 +144,7 @@
   }
 
   .filter-btn.active {
-    background: var(--text-primary); /* ── active filter bg ── */
+    background: var(--text-primary);
     color: var(--bg);
     border-color: var(--text-primary);
   }
@@ -159,17 +159,20 @@
     border-bottom: 1px solid var(--border);
   }
 
+  /* ── year | content | tags+arrow ── */
   .project-row__inner {
     display: grid;
-    grid-template-columns: 4rem 1fr auto; /* ── year | content | tags+arrow ── */
+    grid-template-columns: 4rem 1fr auto;
     gap: 1.5rem 2rem;
     align-items: center;
-    padding: 1.75rem 0; /* ── row vertical padding ── */
+    /* ── row vertical padding ── */
+    padding: 1.75rem 0; 
     transition: padding-left var(--duration-fast) var(--ease-out);
   }
 
+  /* ── indent when hover ── */
   .project-row__inner:hover {
-    padding-left: 0.5rem; /* ── subtle indent on hover ── */
+    padding-left: 0.5rem; 
   }
 
   .project-row__year {
@@ -220,13 +223,10 @@
     color: var(--text-primary);
   }
 
-  /* ── Responsive: stack on small screens ── */
+  /* ── Responsive── */
   @media (max-width: 640px) {
-    .project-row__inner {
-      grid-template-columns: 1fr;
-    }
-    .project-row__right {
-      align-items: flex-start;
-    }
-  }
+  .project-row__inner { grid-template-columns: 1fr; gap: 0.75rem; }
+  .project-row__right { align-items: flex-start; }
+  .project-row__arrow { display: none; }
+}
 </style>

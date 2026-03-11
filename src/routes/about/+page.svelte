@@ -1,26 +1,25 @@
-<script>
+<script lang="ts">
   import { reveal } from '$lib/actions/reveal.js';
 
-  // ── Edit all your personal info here ──
+  // ── Personal info ──
   const name    = 'RUEI-JIE (RACHEL) CHANG';
-  const role    = 'M.A. Digital Texts and Culture'; // degree / year / role
+  const role    = 'M.A. Digital Texts and Culture';
   const email   = 'rueijiechang@uchicago.edu';
 
-  // Paragraphs for the bio section — add/remove as needed
   // ── Bio paragraphs — use highlight() to wrap words in <mark> spans ──
-  // Syntax: wrap any word/phrase in [[double brackets]] to highlight it
+  // wrap in [[double brackets]] to highlight it
   const bioRaw = [
     "I am an M.A. student in Digital Studies of Language, Culture, and History at the University of Chicago. My research examines the cultural and literary history of [[imaginaries of machine intelligence]] and the [[epistemologies of large language models]].",
 
     "Methodologically, I combine [[close reading]] with [[computational analysis]]. I build and curate structured textual corpora, encode materials in TEI, design metadata schemas, and apply machine learning and other quantitative methods to trace conceptual shifts across time. My approach is both [[technical and critical]]: I am interested not only in what models reveal, but also in how their assumptions structure interpretation, and how editorial decisions in data preparation shape the worldviews reflected in computational outputs.",
   ];
 
-  // Converts [[phrase]] → <mark class="highlight">phrase</mark>
-  // ── You never need to edit this function ──
-  function highlight(text) {
+  // Converts [[double brackets]] to <mark class="highlight">phrase</mark>
+  function highlight(text: string) {
     return text.replace(/\[\[(.+?)\]\]/g, '<mark class="bio-highlight">$1</mark>');
   }
 
+  // ── Education entries —─
 const education = [
   {
     year: '2025 – 2027',
@@ -42,27 +41,27 @@ const education = [
   },
 ];
 
-  // Skills/tools — shown as a simple list
+  // Skills/ languages/ tools
   const skills = [
     { category: 'Languages',  items: ['English', 'Mandarin', 'French', 'Japanese', 'Latin'] },
     { category: 'Programming Languages',  items: ['Python', 'JavaScript'] },
     { category: 'Databases',  items: ['SQLite', 'Neo4j'] },
     { category: 'Web Technologies',  items: ['HTML', 'CSS', 'Svelte'] },
-    // add more rows as needed
   ];
 
+  // Research areas
 const researchAreas = [
   {
     title: 'Literary History & Cultural Theory',
-    desc: 'Close reading and historical analysis of literary texts to trace how cultural, technological, and philosophical ideas are articulated across literary traditions.'
+    desc: 'Close reading across traditions, tracing how ideas travel across time.'
   },
   {
     title: 'Machine Consciousness & AI Imaginaries',
-    desc: 'Cultural histories of how machine minds are imagined across literature and technological discourse from the nineteenth century to the present.'
+    desc: 'Cultural histories of how machine minds are imagined across literature and technological discourse.'
   },
   {
     title: 'Media Archaeologies of Artificial Intelligence',
-    desc: 'Historical approaches to artificial intelligence across earlier media, automata, and computational systems, tracing how technological imaginaries of intelligence emerge over time.'
+    desc: 'Automata, early computers, and the long history of imagining intelligent machines.'
   },
   {
     title: 'Large Language Models & Epistemology',
@@ -74,10 +73,10 @@ const researchAreas = [
   },
   {
     title: 'Computational Literary Studies',
-    desc: 'Topic modeling, NLP, and temporal analysis applied to literary corpora to trace conceptual and cultural shifts across time.'
+    desc: 'Discovering patterns across large textual corpora using machine learning, network analysis, and other computational methods.'
   },
   {
-    title: 'Digital Scholarly Editing & Text Infrastructure',
+    title: 'Corpus Building & Digital Editing',
     desc: 'TEI encoding, metadata schema design, and corpus curation for structured literary and historical materials.'
   },
 ];
@@ -175,7 +174,7 @@ const researchAreas = [
   }
 
   .about__role {
-    color: var(--accent); /* ── role/degree accent color ── */
+    color: var(--accent);
     margin-top: 1.5rem;
     margin-bottom: 0;
 
@@ -188,7 +187,7 @@ const researchAreas = [
     flex-direction: column;
     gap: 1.25rem;
     margin-bottom: var(--space-lg);
-    padding-left: 0; /* reset container narrow inline padding if needed */
+    padding-left: 0;
   }
 
   .about__bio p {
@@ -210,9 +209,10 @@ const researchAreas = [
   .divider {
     border: none;
     border-top: 1px solid var(--border);
-    /* margin: var(--space-lg) 0; */
     margin: 2.5rem 0;
   }
+
+  /* highlight */
 
 :global(.bio-highlight) {
   background: none;
@@ -220,7 +220,7 @@ const researchAreas = [
   text-decoration: underline;
   text-decoration-color: var(--accent);
   text-decoration-thickness: 2px;
-  text-underline-offset: 3px; /* ── increase to push line further, decrease to bring closer ── */
+  text-underline-offset: 3px;
 }
 
   /* ── Section label ── */
@@ -247,24 +247,25 @@ const researchAreas = [
   }
 
   .skill-group__items li {
-    font-size: 0.95rem;
+    font-size: 1.25rem;
     color: var(--text-secondary);
   }
 .research-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* ── column width ── */
+  /* ── column width ── */
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 2rem 3rem;
 }
 
 .research-item__title {
-  font-size: 0.95rem;
+  font-size: 1.25rem;
   color: var(--text-primary);
   font-weight: 500;
   margin-bottom: 0.4rem;
 }
 
 .research-item__desc {
-  font-size: 0.88rem;
+  font-size: 1rem;
   color: var(--text-secondary);
   line-height: 1.7;
 }
@@ -282,7 +283,8 @@ const researchAreas = [
 }
 
 .education-item__year {
-  min-width: 90px; /* ── adjust to align columns ── */
+  /* gaps between columns */
+  min-width: 90px;
   color: var(--text-secondary);
 }
 
@@ -303,5 +305,13 @@ const researchAreas = [
 .education-item__school {
   color: var(--text-primary);
   font-size: 0.95rem;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .education-item { flex-direction: column; gap: 0.5rem; }
+  .skills-grid { grid-template-columns: 1fr; }
+  .research-grid { grid-template-columns: 1fr; }
+  .about__bio p { font-size: 1.1rem; }
 }
 </style>

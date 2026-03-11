@@ -1,6 +1,5 @@
 
 // ── PoetryDB poem result ──
-// Used in: src/routes/+page.svelte
 export type Poem = {
   title:  string;
   author: string;
@@ -8,7 +7,6 @@ export type Poem = {
 };
 
 // ── A featured project card on the homepage ──
-// Used in: src/routes/+page.svelte
 export type FeaturedProject = {
   slug:   string;
   image:  string;
@@ -20,14 +18,12 @@ export type FeaturedProject = {
 };
 
 // ── One fragment part for the typewriter highlight ──
-// Used in: src/routes/+page.svelte
 export type FragmentPart = {
   text:      string;
   highlight: boolean;
 };
 
 // ── A single coffee tasting entry ──
-// Used in: src/routes/projects/coffee-map/+page.svelte
 export type Coffee = {
   roaster:   string;
   country:   string;
@@ -37,11 +33,10 @@ export type Coffee = {
   variety?:  string;
   process?:  string | null;
   rating:    number;
-  _geo?:     GeoResult | null; // ← added at runtime after geocoding
+  _geo?:     GeoResult | null;
 };
 
 // ── Open-Meteo geocoding result ──
-// Used in: src/routes/projects/coffee-map/+page.svelte
 export type GeoResult = {
   lat:     number;
   lng:     number;
@@ -50,7 +45,6 @@ export type GeoResult = {
 };
 
 // ── Open-Meteo current weather (shown in coffee map popups) ──
-// Used in: src/routes/projects/coffee-map/+page.svelte
 export type CurrentWeather = {
   temperature_2m:       number;
   weathercode:          number;

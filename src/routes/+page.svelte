@@ -1,34 +1,32 @@
 <script lang="ts">
-  // ── lang="ts" added — enables TypeScript in this file ──
   import { onMount } from 'svelte';
   import { reveal } from '$lib/actions/reveal.js';
   import type { Poem, FeaturedProject, FragmentPart } from '$lib/types';
 
   // ─────────────────────────────────────────────
-  // HERO CONTENT — edit these strings to update copy
+  // HERO
   // ─────────────────────────────────────────────
   const headline = ['TEXTS_', 'COMPUTATION', '_CriticalTheory'];
   const tagline  = 'Digital Humanities';  // ── vertical tagline left of bio ──
   const intro    = 'I study how computational systems reorganize knowledge and interpretation, situating contemporary language models within longer histories of textual mediation and material infrastructure.';
 
   // ─────────────────────────────────────────────
-  // FEATURED PROJECTS
-  // ── FeaturedProject type ensures every card has the right shape ──
+  // FEATURED PROJECTS (wiht Typescript)
   // ─────────────────────────────────────────────
   const featured: FeaturedProject[] = [
     {
       slug: 'photography',
       image: '/images/photography/84.jpg',
-      title: 'Textures of Time',
-      tags: ['Photography', 'Art'],
-      desc: 'My personal black and white archive of surfaces collected across geographies and time. Windows, walls, fabric, rust, skin. Every texture a record of place, climate, and passage.',
+      title: 'Textures',
+      tags: ['Photography', 'Archive'],
+      desc: 'A personal black-and-white archive of surfaces gathered across geographies and time. Sea, windows, mountains, walls, fabric, skin: textures marked by moments passing and what remains.',
       status: 'Ongoing',
     },
     {
       slug: 'coffee-map',
       image: '/images/curve.JPG',
       title: 'Coffee Tasting Map',
-      tags: ['Data', 'Geo', 'API'],
+      tags: ['Data', 'Geo', 'API','Archive'],
       desc: 'An interactive, geocoded archive of my single-origin coffee tastings, linking sensory notes to origin regions and real-time weather data to explore the relationship between place, climate, and flavor.',
       status: 'Ongoing',
     },
@@ -53,7 +51,7 @@
   ];
 
   // ─────────────────────────────────────────────
-  // HOUR → WORD MAP
+  // HOUR to WORD MAPPING
   // ─────────────────────────────────────────────
   const hourWords: string[] = [
     'midnight','one','two','three','four','five','six','seven',
@@ -77,7 +75,7 @@
   const fallbackWords: string[] = ['hour', 'clock', 'time'];
 
   // ─────────────────────────────────────────────
-  // STATE — typed so TypeScript knows what each variable holds
+  // POEM STATE for TypeScript
   // ─────────────────────────────────────────────
   let fragment:        string  = '';
   let poemTitle:       string  = '';
@@ -86,19 +84,20 @@
   let loading:         boolean = true;
   let noResult:        boolean = false;
   let drawing:         boolean = false;
-  let poemPool:        Poem[]  = []; // ← typed as array of Poem
+  let poemPool:        Poem[]  = [];
   let displayed:       string  = '';
   let typing:          boolean = false;
-  let typewriterTimer: ReturnType<typeof setInterval>; // ← typed timer
+  let typewriterTimer: ReturnType<typeof setInterval>;
 
   // ─────────────────────────────────────────────
-  // TIME HELPERS
+  // GETTING TIME and BUILDING TIME LABEL
   // ─────────────────────────────────────────────
   function getNow(): { hour: number; minute: number } {
     const d = new Date();
     return { hour: d.getHours(), minute: d.getMinutes() };
   }
 
+  // Specify how to build the time label based on specific hour and minute
   function buildTimeLabel(hour: number, minute: number): string {
     const h = hourWords[hour];
     if (h === 'midnight' && minute === 0) return 'it is midnight';
@@ -109,8 +108,7 @@
   }
 
   // ─────────────────────────────────────────────
-  // TYPEWRITER
-  // ── speed: change the ms value below ──
+  // TYPEWRITER EFFECT for POEM
   // ─────────────────────────────────────────────
   function typewrite(text: string): void {
     clearInterval(typewriterTimer);
@@ -128,15 +126,17 @@
   }
 
   // ─────────────────────────────────────────────
-  // POETRY FETCH — fetches from poetrydb.org API
+  // FETCHING POEMS from poetrydb.org API
   // ─────────────────────────────────────────────
+
+  // Async function to query poetrydb.org for poems containing a specific word
   async function queryPoetryDB(word: string): Promise<Poem[] | null> {
     const res  = await fetch(`https://poetrydb.org/lines/${encodeURIComponent(word)}`);
     const data = await res.json();
     if (!Array.isArray(data) || data.length === 0) return null;
     return data as Poem[];
   }
-
+// extract a fragment of 1-3 lines from the poem that contains the searched word)
   function extractFragment(lines: string[], word: string): string {
     const idx = lines.findIndex(
       l => l.toLowerCase().includes(word.toLowerCase()) && l.trim().length > 3
@@ -154,6 +154,7 @@
     return matched;
   }
 
+// Draw a poem from the pool based on the searched word
   function drawFromPool(word: string): void {
     const poem   = poemPool[Math.floor(Math.random() * poemPool.length)];
     poemTitle    = poem.title;
@@ -163,6 +164,7 @@
     typewrite(`"${text}"`);
   }
 
+  // Fetch poems from the API based on the current hour
   async function fetchPoems(): Promise<void> {
     loading  = true;
     noResult = false;
@@ -173,6 +175,7 @@
     let   word     = primary;
     let   poems    = await queryPoetryDB(primary);
 
+// If no poems found for the primary word, try fallback words in order until we get results or exhaust the list
     if (!poems) {
       for (const fb of fallbackWords) {
         poems = await queryPoetryDB(fb);
@@ -187,6 +190,7 @@
     loading = false;
   }
 
+  // Draw another poem from the pool
   function drawAnother(): void {
     if (drawing || poemPool.length === 0) return;
     drawing = true;
@@ -226,19 +230,16 @@
 </svelte:head>
 
 
-<!-- ═══════════════════════════════════
-     HERO — stacked minimal
-════════════════════════════════════ -->
+<!-- ─────────────────────────────────────────────
+     HERO
+───────────────────────────────────────────── -->
 <section class="hero container">
 
-  <!-- ── Top row: name left, time block right ── -->
   <div class="hero__top fade-up" use:reveal>
-
-
 
     <!-- ── Time + poetry block — top right ── -->
     <div class="time-block">
-      <!-- clock label e.g. "it is nine forty-three" -->
+      <!-- clock label-->
       <span class="time-block__clock label">{timeLabel}</span>
 
       {#if loading}
@@ -255,7 +256,7 @@
               {part.text}
             {/if}
           {/each}
-          <!-- blinking cursor while typing -->
+          <!-- blinking cursor -->
           {#if typing}
             <span class="time-block__cursor" aria-hidden="true">|</span>
           {/if}
@@ -278,8 +279,8 @@
 
   </div>
 
-  <!-- ── Big stacked headline ── -->
-  <!-- ── edit headline array at top of script ── -->
+
+  <!-- ── Headline ── -->
   <h1 class="display hero__headline" aria-label={headline.join(' ')}>
     {#each headline as word, i}
       <span
@@ -290,16 +291,13 @@
     {/each}
   </h1>
 
-  <!-- ── Bottom row: vertical tagline left, bio + CTAs right ── -->
+  <!-- ── vertical tagline ── -->
   <div class="hero__bottom fade-up" use:reveal style="transition-delay: 200ms">
-
-    <!-- ── vertical tagline — edit tagline const above ── -->
     <span class="hero__tagline-vert">{tagline}</span>
-
     <div class="hero__right">
-      <!-- ── bio text — edit intro const above ── -->
+      <!-- ── bio ── -->
       <p class="hero__intro">{intro}</p>
-
+      <!-- Button to other pages -->
       <div class="hero__cta">
         <a href="/projects" class="btn btn--primary">View Projects / Writings</a>
         <a href="/about"    class="btn btn--ghost">About me →</a>
@@ -311,15 +309,14 @@
 </section>
 
 
-<!-- ═══════════════════════════════════
-     DIVIDER
-════════════════════════════════════ -->
+<!-- ─────────────────────────────────────────────
+     DIVIDER (a line)
+───────────────────────────────────────────── -->
 <div class="container"><hr class="divider" /></div>
 
-
-<!-- ═══════════════════════════════════
+<!-- ─────────────────────────────────────────────
      FEATURED PROJECTS
-════════════════════════════════════ -->
+───────────────────────────────────────────── -->
 <section class="container section">
 
   <div class="section__header fade-up" use:reveal>
@@ -354,9 +351,9 @@
 
 
 <style>
-  /* ════════════════════════════════════
+  /* ─────────────────────────────────────────────
      HERO
-  ════════════════════════════════════ */
+───────────────────────────────────────────── */
   .hero {
     padding-top: 1.5rem;
     padding-bottom: var(--space-lg);
@@ -365,31 +362,32 @@
     width: 100%;
   }
 
-  /* ── Top row: name left, time block right ── */
+
   .hero__top {
     display: flex;
     justify-content: flex-end;
     align-items: flex-start;
-    margin-bottom: 3.5rem;    /* ── space between top row and headline ── */
+    /* ── space between top row and headline ── */
+    margin-bottom: 3.5rem;
   }
 
 
-  /* ════════════════════════════════════
+  /* ─────────────────────────────────────────────
      TIME BLOCK — top right of hero
-  ════════════════════════════════════ */
+───────────────────────────────────────────── */
   .time-block {
     display: flex;
     flex-direction: column;
-    align-items: flex-end;    /* ── right-aligned ── */
+    /* ── right-aligned ── */
+    align-items: flex-end;
     gap: 0.4rem;
-    max-width: 280px;         /* ── caps width of fragment ── */
+    /* ── caps width of fragment ── */
+    max-width: 280px;
     text-align: right;
   }
 
-  /* "it is nine forty-three" — inherits .label */
   .time-block__clock {
     color: var(--text-muted, var(--text-secondary));
-    /* inherits .label: uppercase, 0.7rem, letter-spacing */
   }
 
   .time-block__loading {
@@ -398,8 +396,7 @@
     font-style: italic;
   }
 
-  /* poem fragment — italic, small, right-aligned */
-  /* ── font-size: adjust here ── */
+  /* poem fragment — italic, right-aligned */
   .time-block__fragment {
     font-family: var(--font-display);
     font-size: 0.95rem;
@@ -410,10 +407,10 @@
     margin: 0;
   }
 
-  /* ── matched word highlight ── */
+  /* matched word highlight */
   .time-block__match {
     font-style: normal;
-    color: var(--accent);     /* ── change highlight color here ── */
+    color: var(--accent);
     font-weight: 600;
   }
 
@@ -441,25 +438,9 @@
 
   .time-block__attr em { font-style: italic; }
 
-  /* draw another — tiny ghost button */
-  /* .time-block__draw {
-    font-family: var(--font-body);
-    font-size: 0.6rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-secondary);
-    background: none;
-    border: 1px solid var(--border-strong);
-    padding: 0.25rem 0.85rem;
-    border-radius: 2px;
-    cursor: pointer;
-    margin-top: 0.2rem;
-    transition: all var(--duration-fast) ease;
-  } */
-
 .time-block__draw {
   font-family: var(--font-body);
-  font-size: 0.65rem;              /* ── slightly bigger text too ── */
+  font-size: 0.65rem;            
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--text-primary);
@@ -472,11 +453,6 @@
   transition: all var(--duration-fast) ease;
 }
 
-  /* .time-block__draw:hover {
-    color: var(--text-primary);
-    border-color: var(--text-primary);
-  } */
-
   .time-block__draw:hover {
   background: var(--text-primary);
   color: var(--bg);
@@ -487,28 +463,29 @@
     cursor: default;
   }
 
-  /* ── Big stacked headline ── */
+/* headline */
   .hero__headline {
     display: flex;
-    flex-direction: column;   /* ── stack each word on its own line ── */
+    /* ── stack each word on its own line ── */
+    flex-direction: column;
     gap: 0;
-    margin-bottom: 3rem;      /* ── space between headline and bottom row ── */
-    margin-left: -0.04em;     /* ── optical left alignment ── */
+    margin-bottom: 3rem;      
+    margin-left: -0.04em;    
   }
 
   .hero__word { display: block; }
 
-  /* ── Bottom row: vertical tagline + bio ── */
+  /* ── vertical tagline + bio ── */
   .hero__bottom {
     display: grid;
     grid-template-columns: auto 1fr;
-    gap: 4rem;                /* ── space between tagline and bio ── */
+    /* ── space between tagline and bio ── */
+    gap: 4rem;                
     align-items: start;
     padding-top: 2rem;
     border-top: 1px solid var(--border);
   }
 
-  /* vertical tagline — rotated, reads bottom to top */
   .hero__tagline-vert {
     font-family: var(--font-body);
     font-size: 0.65rem;
@@ -517,7 +494,6 @@
     color: var(--text-secondary);
     writing-mode: vertical-rl;
     transform: rotate(180deg);
-    /* ── change color here ── */
   }
 
   .hero__right {
@@ -530,7 +506,7 @@
   .hero__intro {
     font-size: clamp(0.9rem, 1.6vw, 1.1rem);
     color: var(--text-secondary);
-    max-width: 520px;         /* ── narrow for readability ── */
+    max-width: 520px;   
     line-height: 1.75;
     margin-bottom: 2rem;
   }
@@ -563,9 +539,9 @@
   .divider { border: none; border-top: 1px solid var(--border); margin: 0; }
 
 
-  /* ════════════════════════════════════
-     SHARED SECTION
-  ════════════════════════════════════ */
+  /* ─────────────────────────────────────────────
+     SECTION
+───────────────────────────────────────────── */
   .section { padding: var(--space-lg) 0; }
 
   .section__header {
@@ -579,22 +555,22 @@
   .section__see-all:hover { color: var(--text-primary); }
 
 
-  /* ════════════════════════════════════
+  /* ─────────────────────────────────────────────
      PROJECT GRID
-  ════════════════════════════════════ */
+  ───────────────────────────────────────────── */
   .projects-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: 1rem;
-    border: 1px solid var(--border); 
+    border:none
   }
 
   .project-card {
     display: flex;
     flex-direction: column;
-    background: #9cc7e3;         /* ── card background color ── */
+    /* ── card background color ── */
+    background: rgb(248, 248, 248);   
     transition: background var(--duration-fast) ease;
-    /* border: 1px solid var(--border); */
     margin: -1px;
     border:none;
   }
@@ -640,8 +616,9 @@
     border-radius: 1px;
   }
 
+  /* ── status tag color ── */
   .tag--status {
-    border-color: var(--accent-light);  /* ── status tag border color ── */
+    border-color: var(--accent-light); 
     color: var(--accent);
   }
 
@@ -658,7 +635,18 @@
     inset: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;       /* ── change to 'contain' to avoid cropping ── */
+    object-fit: cover;
     object-position: center;
   }
+
+/* Responsive */
+
+@media (max-width: 640px) {
+  .hero { padding-top: 2rem; }
+  .hero__bottom { grid-template-columns: 1fr; gap: 1.5rem; }
+  .hero__tagline-vert { writing-mode: horizontal-tb; transform: none; }
+  .projects-grid { grid-template-columns: 1fr; }
+  .hero__cta { flex-direction: column; }
+}
+
 </style>
