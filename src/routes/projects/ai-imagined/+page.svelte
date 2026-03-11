@@ -44,7 +44,7 @@
       />
       <figcaption class="label figure__caption">
         Midjourney generated images using the prompt "Artificial Intelligence" (2024).
-        A hundred iterations reveal the same pattern — anthropomorphized, feminized, side profiles.
+        A hundred iterations reveal the same pattern: anthropomorphized, feminized, side profiles.
       </figcaption>
     </figure>
 
@@ -118,7 +118,7 @@
       <p class="section__body">
         The paper turns to Walter Benjamin's framework of aura and technological
         reproducibility to ask this question. AI-generated images are neither copies nor
-        originals — they are simulacra of an aggregated cultural concept, each output unique
+        originals, they are simulacra of an aggregated cultural concept, each output unique
         yet none traceable to a single author or origin. Aura, in this context, resides not
         in the image itself but in the opaque, unpredictable interplay between human
         prompting and machine generation.

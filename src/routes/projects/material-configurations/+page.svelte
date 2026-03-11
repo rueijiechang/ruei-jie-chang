@@ -41,7 +41,7 @@
       <p class="label section__label">The Question</p>
       <p class="section__body">
         When you type a question into ChatGPT and press enter, what actually happens?
-        Not in the hand-wavy sense of "it predicts the next word" — but materially,
+        Not in the hand-wavy sense of "it predicts the next word", but materially,
         mathematically, step by step. And what does that process mean for how we
         understand language, meaning, and authorship?
       </p>
@@ -49,7 +49,7 @@
         This paper argues that AI-generated texts are neither meaningless statistical
         artifacts nor uncanny simulations of human writing. They are something else
         entirely: distinctive material-semiotic practices that emerge from specific
-        computational configurations — and that demand their own theoretical framework.
+        computational configurations, and that demand their own theoretical framework.
       </p>
     </section>
 
@@ -62,15 +62,15 @@
         The paper takes GPT-2 as its case study — not because it is the most powerful
         model, but because its open-source architecture makes genuine technical
         examination possible, something OpenAI's later models no longer allow.
-        Through close analysis of its computational processes — tokenization, vector
+        Through close analysis of its computational processes: tokenization, vector
         embeddings, positional encoding, transformer attention mechanisms, and
-        probabilistic decoding — the paper maps the specific material conditions
+        probabilistic decoding, the paper maps the specific material conditions
         through which AI text emerges.
       </p>
       <p class="section__body">
         This technical analysis is then read through the lens of new materialism,
         drawing on Coole and Frost's account of matter's inherent agency, Hayles'
-        media-specific criticism, and Bajohr's concept of "dumb meaning" — a form
+        media-specific criticism, and Bajohr's concept of "dumb meaning", a form
         of significance that operates below human cognitive processes but is not
         therefore empty. The paper argues that meaning in AI text generation is
         not absent but differently configured: emerging through geometric relationships
@@ -86,21 +86,21 @@
       <p class="label section__label">The Intervention</p>
       <p class="section__body">
         Two dominant positions frame most debates about AI-generated text.
-        The first dismisses it as "stochastic parrots" — form without meaning,
+        The first dismisses it as "stochastic parrots": form without meaning,
         statistical noise dressed as language. The second overclaims, reading AI
         systems through Barthesian and Derridean frameworks in ways that flatten
         the very real differences between human and machine textual production.
       </p>
       <p class="section__body">
         This paper rejects both. Instead of asking whether AI-generated text is
-        "real" language, it asks what kind of material object it actually is —
+        "real" language, it asks what kind of material object it actually is 
         and what theoretical tools we need to examine it on its own terms.
         The answer requires staying close to the specific material processes of
         a specific model at a specific moment, rather than generalizing across
         "AI" as though it were a stable category.
       </p>
       <p class="section__body">
-        The paper also takes seriously the material constraints of these systems —
+        The paper also takes seriously the material constraints of these systems:
         how the biases encoded in training data are not merely a data quality
         problem but a consequence of how social relations become materialized
         into fixed computational configurations, shaping what can be expressed
