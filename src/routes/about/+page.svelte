@@ -114,6 +114,7 @@ const researchAreas = [
   />
 </div>
 
+
   <hr class="divider" />
 
   <!-- ── Education ── -->
