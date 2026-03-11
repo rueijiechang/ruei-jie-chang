@@ -95,13 +95,24 @@ const researchAreas = [
     <p class="about__role heading-sm">{role}</p>
   </header>
 
+
+
+
   <!-- ── Bio ── -->
-  <div class="about__bio container--narrow fade-up" use:reveal>
+<div class="about__bio-wrapper fade-up" use:reveal>
+  <div class="about__bio container--narrow">
     {#each bioRaw as para}
       <p>{@html highlight(para)}</p>
     {/each}
     <a href="mailto:{email}" class="about__email label">{email} →</a>
   </div>
+
+  <img
+    src="/images/rachel.JPG"
+    alt="Ruei-Jie Rachel Chang"
+    class="about__photo"
+  />
+</div>
 
   <hr class="divider" />
 
@@ -307,11 +318,39 @@ const researchAreas = [
   font-size: 0.95rem;
 }
 
+.about__bio-wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+  margin-bottom: var(--space-lg);
+}
+
+.about__bio-wrapper .about__bio {
+  margin-bottom: 0; 
+  padding-left: 0;
+}
+
+.about__photo {
+  flex-shrink: 0;
+  width: 220px;             
+  height: 300px;             
+  object-fit: cover;
+  object-position: center top;
+  border-radius: 2px;
+  border: 1px solid var(--border);
+}
+
+
 /* Responsive */
 @media (max-width: 640px) {
   .education-item { flex-direction: column; gap: 0.5rem; }
   .skills-grid { grid-template-columns: 1fr; }
   .research-grid { grid-template-columns: 1fr; }
   .about__bio p { font-size: 1.1rem; }
+  .about__bio-wrapper { flex-direction: column; }
+  .about__photo { 
+    width: 160px;
+    height: 200px; 
+    margin: 0 auto; }
 }
 </style>
